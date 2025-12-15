@@ -14,8 +14,14 @@ class User extends Authenticatable
     protected $primaryKey = 'id_user'; // Custom PK
 
     protected $fillable = [
-        'first_name', 'last_name', 'username', 'email', 
-        'password', 'role', 'foto_profil', 'status'
+        'first_name',
+        'last_name',
+        'username',
+        'email',
+        'password',
+        'role',
+        'foto_profil',
+        'status'
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -31,10 +37,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Transaksi::class, 'id_user');
     }
-    
+
+    /*
     // Relasi ke Kelas yang sudah diambil (via Progress)
     public function enrolledClasses()
     {
         return $this->hasManyThrough(Kelas::class, ProgressSubMateri::class, 'id_user', 'id_kelas', 'id_user', 'id_kelas')->distinct();
-    }
+    } 
+    */
 }
