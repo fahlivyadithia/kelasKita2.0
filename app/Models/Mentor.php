@@ -17,8 +17,8 @@ class Mentor extends Model
         'keahlian',
         'deskripsi_mentor',
         'status',
-        'bank_penerima',
-        'nomor_rekening_mentor',
+        'bank_name',
+        'rekening_bank',
         'nama_rekening_mentor'
     ];
 

@@ -14,9 +14,9 @@ return new class extends Migration {
             $table->text('deskripsi_mentor')->nullable();
 
             // Tambahkan kolom untuk rekening pencairan dana mentor
-            $table->string('bank_penerima')->nullable();
-            $table->string('nomor_rekening_mentor')->nullable();
-            $table->string('nama_rekening_mentor')->nullable();
+            $table->string('bank_name')->nullable(); // Nama Bank Mentor
+            $table->string('rekening_bank')->nullable(); // No Rekening Mentor
+            $table->string('nama_rekening_mentor')->nullable(); // Nama di Buku Tabungan
 
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->timestamps();

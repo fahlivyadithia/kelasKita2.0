@@ -10,5 +10,5 @@ class MetodePembayaran extends Model
     use HasFactory;
     protected $table = 'metode_pembayaran';
     protected $primaryKey = 'id_mp';
-    protected $fillable = ['nama_bank', 'nomor_rekening', 'nama_pemilik', 'is_active'];
+    protected $fillable = ['nama_metode', 'nomor_rekening', 'nama_pemilik', 'is_active'];
 }
