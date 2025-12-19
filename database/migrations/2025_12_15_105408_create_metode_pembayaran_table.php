@@ -9,11 +9,12 @@ return new class extends Migration {
     {
         Schema::create('metode_pembayaran', function (Blueprint $table) {
             $table->id('id_mp');
-            $table->string('metode');
-            $table->string('no_rek')->nullable();
+            $table->string('nama_bank'); // Contoh: Bank BCA, Mandiri
+            $table->string('nomor_rekening');
+            $table->string('nama_pemilik'); // Nama Admin/PT
             $table->boolean('is_active')->default(true);
-            $table->foreignId('id_user')->constrained('users', 'id_user')->onDelete('cascade');
             $table->timestamps();
+            // Hapus foreignId('id_user') agar tidak campur dengan data user
         });
     }
 

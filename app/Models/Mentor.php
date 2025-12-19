@@ -14,10 +14,12 @@ class Mentor extends Model
 
     protected $fillable = [
         'id_user',
-        'rekening_bank',
-        'bank_name',
         'keahlian',
-        'status'
+        'deskripsi_mentor',
+        'status',
+        'bank_penerima',
+        'nomor_rekening_mentor',
+        'nama_rekening_mentor'
     ];
 
     public function user()
