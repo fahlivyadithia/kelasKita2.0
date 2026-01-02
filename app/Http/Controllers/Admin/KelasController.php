@@ -46,4 +46,41 @@ class KelasController extends Controller
 
         return view('admin.pages.kelola-kelas.index', compact('kelas', 'kategoriUnik', 'statusUnik'));
     }
+    public function show($id)
+    {
+        $kelas = Kelas::with(['mentor.user', 'materi.subMateri'])->findOrFail($id);
+        return view('admin.pages.kelola-kelas.show', compact('kelas'));
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status_publikasi' => 'required|in:draft,published,archived',
+        ]);
+
+        $kelas = Kelas::findOrFail($id);
+        $kelas->update(['status_publikasi' => $request->status_publikasi]);
+
+        return back()->with('success', 'Status kelas berhasil diperbarui.');
+    }
+
+    public function updateCatatan(Request $request, $id)
+    {
+        $request->validate([
+            'catatan_admin' => 'nullable|string',
+        ]);
+
+        $kelas = Kelas::findOrFail($id);
+        $kelas->update(['catatan_admin' => $request->catatan_admin]);
+
+        return back()->with('success', 'Catatan admin berhasil disimpan.');
+    }
+
+    public function destroy($id)
+    {
+        $kelas = Kelas::findOrFail($id);
+        $kelas->delete();
+
+        return redirect()->route('admin.kelola.kelas')->with('success', 'Kelas berhasil dihapus.');
+    }
 }

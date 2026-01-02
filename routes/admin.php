@@ -20,7 +20,13 @@ Route::middleware(['auth:admin'])->group(function () {
 
     // Menu Management
     Route::get('/kelola-user', [UserController::class, 'index'])->name('admin.kelola.user');
+    // Kelola Kelas
     Route::get('/kelola-kelas', [KelasController::class, 'index'])->name('admin.kelola.kelas');
+    Route::get('/kelola-kelas/{id}', [KelasController::class, 'show'])->name('admin.kelola.kelas.show');
+    Route::put('/kelola-kelas/{id}/status', [KelasController::class, 'updateStatus'])->name('admin.kelola.kelas.update-status');
+    Route::put('/kelola-kelas/{id}/catatan', [KelasController::class, 'updateCatatan'])->name('admin.kelola.kelas.update-catatan');
+    Route::delete('/kelola-kelas/{id}', [KelasController::class, 'destroy'])->name('admin.kelola.kelas.destroy');
+
     Route::get('/kelola-report', [ReportController::class, 'index'])->name('admin.kelola.report');
     Route::get('/kelola-laporan', [LaporanController::class, 'index'])->name('admin.kelola.laporan');
     Route::get('/kelola-user', [UserController::class, 'index'])->name('admin.kelola.user');

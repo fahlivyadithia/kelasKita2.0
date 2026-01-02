@@ -8,11 +8,6 @@
                     Kelas</h2>
                 <p class="mt-1 text-sm text-slate-500">Manajemen kelas, mentor, dan status publikasi.</p>
             </div>
-            <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-                <button type="button"
-                    class="block rounded-md bg-blue-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">Tambah
-                    Kelas</button>
-            </div>
         </div>
 
         <div class="bg-white shadow sm:rounded-lg">
@@ -94,9 +89,17 @@
                                     {{ number_format($item->harga, 0, ',', '.') }}</td>
                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-slate-500">
                                     <div class="flex gap-2">
-                                        <button class="text-blue-600 hover:text-blue-900">Detail</button>
+                                        <a href="{{ route('admin.kelola.kelas.show', $item->id_kelas) }}"
+                                            class="text-blue-600 hover:text-blue-900">Detail</a>
                                         @if ($item->status_publikasi == 'archived')
-                                            <button class="text-red-600 hover:text-red-900">Hapus</button>
+                                            <form action="{{ route('admin.kelola.kelas.destroy', $item->id_kelas) }}"
+                                                method="POST"
+                                                onsubmit="return confirm('Yakin ingin menghapus kelas ini?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit"
+                                                    class="text-red-600 hover:text-red-900">Hapus</button>
+                                            </form>
                                         @endif
                                     </div>
                                 </td>

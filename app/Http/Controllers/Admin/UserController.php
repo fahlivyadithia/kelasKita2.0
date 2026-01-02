@@ -3,17 +3,17 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Report;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Report::query();
+        $query = User::query();
 
-        $report = $query->get();
+        $users = $query->get();
 
-        return view('admin.pages.kelola-user.index', compact('report'));
+        return view('admin.pages.kelola-user.index', compact('users'));
     }
 }
