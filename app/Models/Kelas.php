@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Kelas extends Model
 {
@@ -12,7 +13,7 @@ class Kelas extends Model
     protected $table = 'kelas';
 
     protected $primaryKey = 'id_kelas';
-
+    
     protected $fillable = [
         'id_mentor',
         'nama_kelas',
@@ -24,19 +25,45 @@ class Kelas extends Model
         'status_publikasi',
     ];
 
+    protected $casts = [
+        'harga' => 'decimal:2',
+    ];
+
+    // ✅ Relasi ke Mentor
     public function mentor()
     {
-        return $this->belongsTo(Mentor::class, 'id_mentor');
+        return $this->belongsTo(Mentor::class, 'id_mentor', 'id_mentor');
     }
 
-    public function materi()
+    // ✅ Relasi ke User (via Mentor)
+    public function user()
     {
-        return $this->hasMany(Materi::class, 'id_kelas')->orderBy('urutan');
+        return $this->hasOneThrough(
+            User::class,
+            Mentor::class,
+            'id_mentor', // FK di mentors
+            'id_user', // FK di users
+            'id_mentor', // PK di kelas
+            'id_user' // PK di mentors
+        );
     }
 
-    public function reviews()
+    // Auto-generate slug
+    protected static function boot()
     {
-        return $this->hasMany(Review::class, 'id_kelas');
+        parent::boot();
+
+        static::creating(function ($kelas) {
+            if (empty($kelas->slug)) {
+                $kelas->slug = Str::slug($kelas->nama_kelas);
+            }
+        });
+
+        static::updating(function ($kelas) {
+            if ($kelas->isDirty('nama_kelas')) {
+                $kelas->slug = Str::slug($kelas->nama_kelas);
+            }
+        });
     }
 
     public function transaksiDetails()
@@ -47,5 +74,18 @@ class Kelas extends Model
     public function adminNote()
     {
         return $this->morphOne(AdminNote::class, 'notable');
+    }
+
+    // ============================================================
+    // TAMBAHAN: Relasi agar Controller Progress tidak Error
+    // ============================================================
+    
+    /**
+     * Menghubungkan Kelas ke Materi (Bab)
+     * Dibutuhkan oleh ApiProgressController::index
+     */
+    public function materi()
+    {
+        return $this->hasMany(Materi::class, 'id_kelas', 'id_kelas');
     }
 }

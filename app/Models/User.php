@@ -4,8 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 
 
 class User extends Authenticatable
@@ -27,23 +29,33 @@ class User extends Authenticatable
     const STATUS_BANNED = 'banned';
 
     protected $table = 'users';
+    protected $primaryKey = 'id_user';
+    public $timestamps = false;
 
-    protected $primaryKey = 'id_user'; // Custom PK
+    // Custom PK
 
     protected $fillable = [
         'first_name',
-        'last_name',
         'username',
         'email',
         'password',
+        'deskripsi',
         'role',
         'deskripsi',
         'foto_profil',
         'status',
     ];
 
-    protected $hidden = ['password', 'remember_token'];
+    protected $hidden = [
+        'password',
+    ];
 
+    public function getAuthIdentifierName()
+    {
+        return 'id_user';
+    }
+
+    // ✅ Relasi ke Mentor
     protected $casts = [
         'password' => 'hashed',
     ];
@@ -67,7 +79,7 @@ class User extends Authenticatable
     // Relasi One-to-One ke Mentor
     public function mentor()
     {
-        return $this->hasOne(Mentor::class, 'id_user');
+        return $this->hasOne(Mentor::class, 'id_user', 'id_user');
     }
 
     public function socialAccounts()
@@ -75,6 +87,11 @@ class User extends Authenticatable
         
         //return $this->hasMany(SocialAccount::class, 'id_user');//
     }
+
+    // public function socialAccounts()
+    // {
+    //     return $this->hasMany(SocialAccount::class, 'id_user');
+    // }
 
     public function adminNote()
     {
@@ -86,7 +103,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(Transaksi::class, 'id_user');
     }
-
+}
     /*
     // Relasi ke Kelas yang sudah diambil (via Progress)
     public function enrolledClasses()
@@ -94,4 +111,5 @@ class User extends Authenticatable
         return $this->hasManyThrough(Kelas::class, ProgressSubMateri::class, 'id_user', 'id_kelas', 'id_user', 'id_kelas')->distinct();
     }
     */
-}
+
+
