@@ -1,15 +1,12 @@
 <?php
 
-use App\Http\Controllers\KelasController;
+
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KeranjangController;
 use App\Http\Controllers\TransaksiController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Api\Mentor\MentorDashboardController; // Pastikan path ini sesuai
-use App\Http\Controllers\HomeController;    
-use App\Http\Controllers\KeranjangController;
-use App\Http\Controllers\TransaksiController;
+use App\Http\Controllers\Api\Mentor\MentorDashboardController; // Pastikan path ini sesuai    
 use App\Http\Controllers\Api\Mentor\KelasController;
 use App\Http\Controllers\Api\Mentor\MateriController;
 use App\Http\Controllers\Api\Mentor\SubMateriController;
@@ -18,7 +15,7 @@ use App\Http\Controllers\ProgressController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ReportController;
 
-<<<<<<< HEAD
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -40,7 +37,7 @@ Route::post('/register', [AuthController::class, 'register'])->name('register.su
 // Logout
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
- Route::middleware(['auth'])->group(function () {
+ //Route::middleware(['auth'])->group(function () {
 
     // 1. Keranjang
     Route::get('/keranjang', [KeranjangController::class, 'index'])->name('keranjang.index');
@@ -52,11 +49,11 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/transaksi/{id_transaksi}', [TransaksiController::class, 'show'])->name('transaksi.show');
     Route::post('/transaksi/bayar', [TransaksiController::class, 'bayar'])->name('transaksi.bayar');
 
-    Route::get('/student/dashboard', function () {
-        return "Halo Siswa! Ini Dashboard Student (Masih Kosong).";
-    })->name('student.dashboard');
+   // Route::get('/student/dashboard', function () {
+       // return "Halo Siswa! Ini Dashboard Student (Masih Kosong).";
+   // })->name('student.dashboard');
 
-});
+//});
 
 Route::middleware(['auth'])->prefix('mentor')->name('mentor.')->group(function () {
 
@@ -93,15 +90,4 @@ Route::middleware(['auth'])->prefix('mentor')->name('mentor.')->group(function (
                 Route::delete('/{id_sub_materi}', [SubMateriController::class, 'destroy'])->name('destroy');
         });
     });
-
 });
-=======
-Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/kelas/{id}', [KelasController::class, 'show'])->name('kelas.detail');
-Route::get('/keranjang', [KeranjangController::class, 'index'])->name('keranjang.index');
-Route::post('/keranjang/tambah', [KeranjangController::class, 'tambah'])->name('keranjang.tambah');
-Route::delete('/keranjang/hapus/{id}', [KeranjangController::class, 'hapus'])->name('keranjang.hapus');
-Route::get('/transaksi', [TransaksiController::class, 'index'])->name('transaksi.index');
-Route::post('/transaksi/checkout', [TransaksiController::class, 'checkout'])->name('transaksi.checkout');
-Route::get('/transaksi/{id}', [TransaksiController::class, 'show'])->name('transaksi.detail');
->>>>>>> 718c466f46e4d9068ea73ed3b26406fe2b227f8c
