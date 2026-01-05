@@ -1,4 +1,4 @@
-<?php
+    <?php
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -85,12 +85,13 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
-Route::prefix('admin')->group(function () {
-    // Public routes
-    Route::post('/login', [\App\Http\Controllers\Api\Admin\AuthController::class, 'login']);
+        Route::prefix('admin')->group(function () {
+        // Public routes
+        Route::post('/login', [\App\Http\Controllers\Api\Admin\AuthController::class, 'login']);
+
 
     // Protected routes
-    Route::middleware(['auth:sanctum', \App\Http\Middleware\EnsureAdmin::class])->group(function () {
+        Route::middleware(['auth:sanctum', \App\Http\Middleware\EnsureAdmin::class])->group(function () {
         Route::post('/logout', [\App\Http\Controllers\Api\Admin\AuthController::class, 'logout']);
         Route::get('/me', [\App\Http\Controllers\Api\Admin\AuthController::class, 'me']);
 
@@ -106,6 +107,7 @@ Route::prefix('admin')->group(function () {
             Route::patch('/{id}/status', [\App\Http\Controllers\Api\Admin\UserController::class, 'updateStatus']);
             Route::patch('/{id}/catatan', [\App\Http\Controllers\Api\Admin\UserController::class, 'updateCatatan']);
             Route::patch('/{id}/activate', [\App\Http\Controllers\Api\Admin\UserController::class, 'activate']);
+
         });
     });
 });
