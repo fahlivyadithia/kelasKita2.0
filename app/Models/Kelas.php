@@ -66,7 +66,7 @@ class Kelas extends Model
             }
         });
     }
-}
+
 
     public function transaksiDetails()
     {
@@ -78,3 +78,6 @@ class Kelas extends Model
         return $this->morphOne(AdminNote::class, 'notable');
     }
 
+    
+
+}

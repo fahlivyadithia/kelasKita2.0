@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 
 class User extends Authenticatable
 {
@@ -29,7 +31,7 @@ class User extends Authenticatable
     protected $primaryKey = 'id_user';
     public $timestamps = false;
 
-    protected $primaryKey = 'id_user'; // Custom PK
+    // Custom PK
 
     protected $fillable = [
         'first_name',
@@ -80,10 +82,10 @@ class User extends Authenticatable
     }
 
 
-    public function socialAccounts()
-    {
-        return $this->hasMany(SocialAccount::class, 'id_user');
-    }
+    // public function socialAccounts()
+    // {
+    //     return $this->hasMany(SocialAccount::class, 'id_user');
+    // }
 
     public function adminNote()
     {

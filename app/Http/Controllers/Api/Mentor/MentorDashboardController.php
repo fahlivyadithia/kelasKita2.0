@@ -4,65 +4,46 @@ namespace App\Http\Controllers\Api\Mentor;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Mentor;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Kelas;
-use App\Models\TransaksiDetail;
-use App\Models\Review;
+use App\Models\User;
 
 class MentorDashboardController extends Controller
 {
-    // Method untuk menampilkan Tampilan Web (Blade)
     public function indexWeb()
     {
-        $user = auth()->user();
-        $mentor = Mentor::where('id_user', $user->id_user)->first();
+        $user = Auth::user();
 
-        if (!$mentor) {
-            abort(403, 'Akses Ditolak. Anda bukan Mentor.');
+        // Cek apakah user ini benar-benar mentor
+        if ($user->role !== 'mentor') {
+            abort(403, 'Akses Ditolak');
         }
 
-        // --- 1. Hitung Statistik ---
+        // --- HITUNG STATISTIK ---
         
-        // A. Total Kelas
-        $totalKelas = Kelas::where('id_mentor', $mentor->id_mentor)->count();
+        // 1. Total Kelas (Sesuai ID User yang login)
+        $totalKelas = Kelas::where('id_mentor', $user->id_user)->count();
 
-        // B. Ambil ID Kelas milik mentor ini (untuk query selanjutnya)
-        $kelasIds = Kelas::where('id_mentor', $mentor->id_mentor)->pluck('id_kelas');
+        // 2. Total Siswa & Pendapatan (Sementara kita set 0 dulu jika belum ada tabel transaksi)
+        // Nanti jika modul transaksi sudah ada, kita update query ini.
+        $totalSiswa = 0; 
+        $totalPendapatan = 0; 
+        $avgRating = 0;
 
-        // C. Total Siswa (Unik & Status Paid)
-        $totalSiswa = TransaksiDetail::whereIn('id_kelas', $kelasIds)
-            ->whereHas('transaksi', function($q) { 
-                $q->where('status', 'paid'); 
-            })
-            ->join('transaksi', 'transaksi.id_transaksi', '=', 'transaksi_detail.id_transaksi')
-            ->distinct('transaksi.id_user')
-            ->count('transaksi.id_user');
+        // Contoh Query jika nanti tabel transaksi sudah ada:
+        /*
+        $kelasIds = Kelas::where('id_mentor', $user->id_user)->pluck('id_kelas');
+        $totalSiswa = TransaksiDetail::whereIn('id_kelas', $kelasIds)->count();
+        $totalPendapatan = TransaksiDetail::whereIn('id_kelas', $kelasIds)->sum('harga_saat_beli');
+        */
 
-        // D. Total Pendapatan
-        $totalPendapatan = TransaksiDetail::whereIn('id_kelas', $kelasIds)
-            ->whereHas('transaksi', function($q) { 
-                $q->where('status', 'paid'); 
-            })
-            ->sum('harga_saat_beli');
-
-        // E. Rata-rata Rating
-        $avgRating = Review::whereIn('id_kelas', $kelasIds)->avg('bintang');
-
-        // F. Transaksi Terakhir (Untuk tabel di dashboard)
-        $recentActivities = TransaksiDetail::whereIn('id_kelas', $kelasIds)
-            ->whereHas('transaksi', function($q) { $q->where('status', 'paid'); })
-            ->with(['transaksi.user', 'kelas'])
-            ->orderBy('created_at', 'desc')
-            ->limit(5)
-            ->get();
-
-        // --- 2. Lempar data ke View ---
+        // Kirim data ke View
         return view('mentor.dashboard', compact(
+            'user', 
             'totalKelas', 
             'totalSiswa', 
             'totalPendapatan', 
-            'avgRating', 
-            'recentActivities'
+            'avgRating'
         ));
     }
 }
