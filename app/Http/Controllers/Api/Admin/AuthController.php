@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -21,21 +20,21 @@ class AuthController extends Controller
 
         if (! $user || ! Hash::check($request->password, $user->password)) {
             return response()->json([
-                'message' => 'Email atau password salah.'
+                'message' => 'Email atau password salah.',
             ], 401);
         }
 
         // Cek apakah user adalah admin
         if ($user->role !== User::ROLE_ADMIN) {
-             return response()->json([
-                'message' => 'Anda tidak memiliki akses ke halaman ini.'
+            return response()->json([
+                'message' => 'Anda tidak memiliki akses ke halaman ini.',
             ], 403);
         }
 
         // Cek status user
         if ($user->status !== 'active') {
             return response()->json([
-                'message' => 'Akun anda tidak aktif.'
+                'message' => 'Akun anda tidak aktif.',
             ], 403);
         }
 
@@ -43,8 +42,8 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Login berhasil',
-            'user' => $user,
-            'token' => $token
+            'admin' => $user,
+            'token' => $token,
         ]);
     }
 
@@ -57,7 +56,7 @@ class AuthController extends Controller
         }
 
         return response()->json([
-            'message' => 'Logout berhasil'
+            'message' => 'Logout berhasil',
         ]);
     }
 

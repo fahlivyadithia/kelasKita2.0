@@ -12,6 +12,11 @@ use App\Http\Controllers\Api\SubMateriController;
 use App\Http\Controllers\Api\VideoController;
 use App\Http\Controllers\Api\DokumenController;
 use App\Http\Controllers\Api\Mentor\MentorDashboardController;
+use App\Http\Controllers\Api\MentorDashboardController;
+use App\Http\Controllers\Api\Murid\ApiReviewController;
+use App\Http\Controllers\Api\Murid\ApiProgressController;
+use App\Http\Controllers\Api\Murid\ApiReportController;
+use App\Http\Controllers\TransaksiController;
 
 // === PUBLIC ROUTES ===
 Route::post('/register', [AuthController::class, 'register']);
@@ -73,9 +78,8 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // 3. View Detail Review
     Route::get('/mentor/reviews', [MentorDashboardController::class, 'getReviews']);
+    });
 });
-
-
 
 /*
 |--------------------------------------------------------------------------
@@ -86,14 +90,12 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-
-        Route::prefix('admin')->group(function () {
-        // Public routes
-        Route::post('/login', [\App\Http\Controllers\Api\Admin\AuthController::class, 'login']);
-
+Route::prefix('admin')->group(function () {
+    // Public routes
+    Route::post('/login', [\App\Http\Controllers\Api\Admin\AuthController::class, 'login']);
 
     // Protected routes
-        Route::middleware(['auth:sanctum', \App\Http\Middleware\EnsureAdmin::class])->group(function () {
+    Route::middleware(['auth:sanctum', \App\Http\Middleware\EnsureAdmin::class])->group(function () {
         Route::post('/logout', [\App\Http\Controllers\Api\Admin\AuthController::class, 'logout']);
         Route::get('/me', [\App\Http\Controllers\Api\Admin\AuthController::class, 'me']);
 
@@ -109,7 +111,29 @@ Route::get('/user', function (Request $request) {
             Route::patch('/{id}/status', [\App\Http\Controllers\Api\Admin\UserController::class, 'updateStatus']);
             Route::patch('/{id}/catatan', [\App\Http\Controllers\Api\Admin\UserController::class, 'updateCatatan']);
             Route::patch('/{id}/activate', [\App\Http\Controllers\Api\Admin\UserController::class, 'activate']);
+        });
 
+        // Kelas Management
+        Route::prefix('kelas')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Api\Admin\KelasController::class, 'index']);
+            Route::get('/{id}', [\App\Http\Controllers\Api\Admin\KelasController::class, 'show']);
+            Route::delete('/{id}', [\App\Http\Controllers\Api\Admin\KelasController::class, 'destroy']);
+            Route::patch('/{id}/status', [\App\Http\Controllers\Api\Admin\KelasController::class, 'updateStatus']);
+            Route::patch('/{id}/catatan', [\App\Http\Controllers\Api\Admin\KelasController::class, 'updateCatatan']);
+        });
+
+        // Laporan (Transaksi) Management
+        Route::prefix('laporan')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Api\Admin\LaporanController::class, 'index']);
+        });
+
+        // Report (User Complaints) Management
+        Route::prefix('reports')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Api\Admin\ReportController::class, 'index']);
+            Route::get('/{id}', [\App\Http\Controllers\Api\Admin\ReportController::class, 'show']);
+            Route::delete('/{id}', [\App\Http\Controllers\Api\Admin\ReportController::class, 'destroy']);
+            Route::patch('/{id}/status', [\App\Http\Controllers\Api\Admin\ReportController::class, 'updateStatus']);
+            Route::patch('/{id}/catatan', [\App\Http\Controllers\Api\Admin\ReportController::class, 'updateCatatan']);
         });
     });
 });

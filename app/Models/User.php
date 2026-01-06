@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 
+
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
@@ -57,6 +58,8 @@ class User extends Authenticatable
     // ✅ Relasi ke Mentor
     protected $casts = [
         'password' => 'hashed',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     // Role Helper Methods
@@ -81,6 +84,11 @@ class User extends Authenticatable
         return $this->hasOne(Mentor::class, 'id_user', 'id_user');
     }
 
+    public function socialAccounts()
+    {
+        
+        //return $this->hasMany(SocialAccount::class, 'id_user');//
+    }
 
     // public function socialAccounts()
     // {
