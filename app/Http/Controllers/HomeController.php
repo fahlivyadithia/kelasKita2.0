@@ -3,17 +3,19 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\Controller;
+use App\Models\Kelas;
 
 class HomeController extends Controller
 {
     public function index()
     {
-        // Panggil API
-        $apiUrl = config('app.url') . '/api/home';
+
+         $apiUrl = config('app.url') . '/api/home';
         $response = Http::get($apiUrl);
         
-        $kelas = $response->successful() ? $response->json()['data'] : [];
+        $kelas = Kelas::latest()->get(); 
 
-        return view('home', compact('kelas'));
+        // Kirim ke View
+        return view('Home', compact('kelas'));
     }
 }

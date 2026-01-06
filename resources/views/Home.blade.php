@@ -29,30 +29,38 @@
     @if(isset($kelas) && count($kelas) > 0) 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         @foreach($kelas as $item) 
-        <div class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 group border border-gray-100 flex flex-col h-full">
-            <div class="relative">
-                <img src="{{ $item['thumbnail'] ? asset('storage/'.$item['thumbnail']) : 'https://via.placeholder.com/400x250?text=KelasKu' }}" alt="{{ $item['nama_kelas'] }}" class="w-full h-56 object-cover">
-                <div class="absolute top-4 right-4 bg-white text-primary font-bold px-4 py-1.5 rounded-full shadow-md text-sm">
-                    Rp {{ number_format($item['harga'], 0, ',', '.') }}
-                </div>
-            </div>
-
-            <div class="p-6 flex-1 flex flex-col">
-                <h3 class="text-xl font-bold text-gray-800 mb-3 leading-snug">
-                    <a href="{{ route('kelas.detail', $item['id_kelas']) }}" class="hover:text-primary transition">
-                        {{ $item['nama_kelas'] }}
-                    </a>
-                </h3>
-                <p class="text-sm text-gray-500 mb-4 line-clamp-2">{{ $item['description'] ?? 'Deskripsi kelas...' }}</p>
-                
-                <div class="mt-auto pt-4 border-t border-gray-100">
-                    <a href="{{ route('kelas.detail', $item['id_kelas']) }}" class="text-primary font-bold text-sm hover:underline">
-                        Lihat Detail <i class="fas fa-arrow-right ml-1"></i>
-                    </a>
-                </div>
+    <div class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 group border border-gray-100 flex flex-col h-full">
+        <div class="relative">
+            {{-- PERBAIKAN: Gunakan ->thumbnail --}}
+            <img src="{{ $item->thumbnail ? asset('storage/'.$item->thumbnail) : 'https://via.placeholder.com/400x250?text=KelasKu' }}" alt="{{ $item->nama_kelas }}" class="w-full h-56 object-cover">
+            
+            <div class="absolute top-4 right-4 bg-white text-primary font-bold px-4 py-1.5 rounded-full shadow-md text-sm">
+                {{-- PERBAIKAN: Gunakan ->harga --}}
+                Rp {{ number_format($item->harga, 0, ',', '.') }}
             </div>
         </div>
-        @endforeach
+
+        <div class="p-6 flex-1 flex flex-col">
+            <h3 class="text-xl font-bold text-gray-800 mb-3 leading-snug">
+                {{-- PERBAIKAN: Gunakan ->id_kelas (Pastikan nama kolom di DB id_kelas atau id) --}}
+                <a href="{{ route('Detail_kelas', $item->id_kelas ?? $item->id) }}" class="hover:text-primary transition">
+                    {{-- PERBAIKAN: Gunakan ->nama_kelas --}}
+                    {{ $item->nama_kelas }}
+                </a>
+            </h3>
+            
+            {{-- PERBAIKAN: Gunakan ->description --}}
+            <p class="text-sm text-gray-500 mb-4 line-clamp-2">{{ $item->description ?? 'Deskripsi kelas...' }}</p>
+            
+            <div class="mt-auto pt-4 border-t border-gray-100">
+                {{-- PERBAIKAN: Gunakan ->id_kelas --}}
+                <a href="{{ route('Detail_kelas', $item->id_kelas ?? $item->id) }}" class="text-primary font-bold text-sm hover:underline">
+                    Lihat Detail <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    @endforeach
     </div>
     @else
     <div class="text-center py-20">

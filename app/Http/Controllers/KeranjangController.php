@@ -1,46 +1,118 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
-use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 
 class KeranjangController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $userId = auth()->id() ?? 1; // Asumsi ID 1 jika belum login auth
-        $apiUrl = config('app.url') . '/api/keranjang';
-        
-        $response = Http::get($apiUrl, ['id_user' => $userId]);
-        $keranjang = $response->successful() ? $response->json()['data'] : [];
+        // Ambil data dari Session
+        $cart = session()->get('cart', []);
 
         // Hitung Total
         $total = 0;
-        foreach ($keranjang as $item) {
-            $total += $item['kelas']['harga'] ?? 0;
+        foreach($cart as $item) {
+            $total += $item['harga'];
         }
 
-        return view('keranjang', compact('keranjang', 'total'));
+        if ($request->wantsJson() || $request->is('api/*')) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Data keranjang berhasil diambil',
+                'total_harga' => $total,
+                'data' => $cart
+            ], 200);
+        }
+
+        // Jika request dari Browser biasa
+        return view('Keranjang', compact('cart', 'total'));
     }
 
-    public function tambah(Request $request)
+    public function addToCart(Request $request, $id)
     {
-        $userId = auth()->id() ?? 1;
-        $apiUrl = config('app.url') . '/api/keranjang';
+        // Ambil data kelas dari DB
+        $kelas = DB::table('kelas')
+                ->leftJoin('users', 'kelas.id_mentor', '=', 'users.id_user')
+                ->select('kelas.*', 'users.first_name', 'users.last_name')
+                ->where('kelas.id_kelas', $id)
+                ->first();
+
+        // Cek jika kelas tidak ada
+        if(!$kelas) {
+            $pesan = 'Kelas tidak ditemukan!';
+            
+            // Response API Error
+            if ($request->wantsJson() || $request->is('api/*')) {
+                return response()->json(['status' => 'error', 'message' => $pesan], 404);
+            }
+            // Response Web Error
+            return redirect()->back()->with('error', $pesan);
+        }
+
+        $cart = session()->get('cart', []);
+
+        // Cek Duplikasi
+        if(isset($cart[$id])) {
+            $pesan = 'Kelas ini sudah ada di keranjang Anda!';
+            
+            // Response API Warning
+            if ($request->wantsJson() || $request->is('api/*')) {
+                return response()->json(['status' => 'warning', 'message' => $pesan], 409);
+            }
+            // Response Web Warning
+            return redirect()->route('cart.index')->with('warning', $pesan);
+        }
+
+        // Masukkan ke Session
+        $cart[$id] = [
+            "id_kelas" => $kelas->id_kelas,
+            "nama_kelas" => $kelas->nama_kelas,
+            "harga" => $kelas->harga,
+            "thumbnail" => $kelas->thumbnail,
+            "mentor" => $kelas->first_name . ' ' . $kelas->last_name
+        ];
+
+        session()->put('cart', $cart);
+
+        $pesanSukses = 'Kelas berhasil masuk keranjang!';
+
+        if ($request->wantsJson() || $request->is('api/*')) {
+            return response()->json([
+                'status' => 'success',
+                'message' => $pesanSukses,
+                'data' => $cart[$id] // Tampilkan data yang barusan masuk
+            ], 200);
+        }
+
+        // Jika Browser
+        return redirect()->route('cart.index')->with('success', $pesanSukses);
+    }
+    
+    public function remove(Request $request, $id)
+    {
+        $cart = session()->get('cart');
         
-        Http::post($apiUrl, [
-            'id_user' => $userId,
-            'id_kelas' => $request->id_kelas
-        ]);
+        if(isset($cart[$id])) {
+            unset($cart[$id]);
+            session()->put('cart', $cart);
+        }
+        
+        $pesan = 'Kelas dihapus dari keranjang';
 
-        return redirect()->route('keranjang.index');
-    }
+        // --- LOGIKA HYBRID ---
+        if ($request->wantsJson() || $request->is('api/*')) {
+            return response()->json([
+                'status' => 'success', 
+                'message' => $pesan,
+                'sisa_keranjang' => session()->get('cart')
+            ], 200);
+        }
 
-    public function hapus($id_keranjang)
-    {
-        $apiUrl = config('app.url') . "/api/keranjang/{$id_keranjang}";
-        Http::delete($apiUrl);
-        return redirect()->route('keranjang.index');
+        return redirect()->back()->with('success', $pesan);
+        
+        return view('keranjang', compact('cart', 'total'));
     }
 }

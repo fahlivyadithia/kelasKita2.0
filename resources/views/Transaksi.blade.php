@@ -1,94 +1,89 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout | KelasKu</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-50 font-sans text-gray-800">
+@extends('layouts.app')
 
-    <nav class="bg-white shadow h-16 flex items-center px-6 mb-8">
-        <a href="{{ route('home') }}" class="text-2xl font-bold text-gray-900">KelasKu</a>
-        <span class="mx-4 text-gray-300">|</span>
-        <span class="text-lg font-medium text-gray-600">Checkout Aman</span>
-    </nav>
+@section('content')
+<div class="container mx-auto px-6 py-12">
+    <div class="max-w-4xl mx-auto">
+        
+        {{-- HEADER --}}
+        <div class="text-center mb-10">
+            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+                <i class="fas fa-check text-3xl text-green-600"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800">Menunggu Pembayaran</h1>
+            <p class="text-gray-500">Invoice <span class="font-mono font-bold text-gray-800">#{{ $transaksi->kode_invoice }}</span> berhasil dibuat.</p>
+        </div>
 
-    <div class="max-w-6xl mx-auto px-6 pb-12">
-        <form action="{{ route('transaksi.bayar') }}" method="POST">
-            @csrf
-            <input type="hidden" name="id_transaksi" value="{{ $trx['id_transaksi'] }}">
-
-            <div class="lg:flex gap-12">
-                <div class="lg:w-2/3">
-                    <h2 class="text-2xl font-bold mb-6">Metode Pembayaran</h2>
-                    
-                    <div class="bg-white border border-gray-300 rounded overflow-hidden">
-                        <div class="bg-gray-50 p-4 border-b border-gray-200 flex justify-between items-center cursor-pointer">
-                            <span class="font-bold text-gray-800"><i class="fas fa-lock mr-2"></i> Pilih Metode</span>
-                            <span class="text-sm text-gray-500">Koneksi Aman</span>
-                        </div>
-
-                        <div class="p-6 space-y-4">
-                            @foreach($methods as $mp)
-                            <label class="flex items-center p-4 border border-gray-200 rounded cursor-pointer hover:border-purple-600 transition hover:bg-purple-50 group">
-                                <input type="radio" name="id_mp" value="{{ $mp['id_mp'] }}" class="w-5 h-5 text-purple-600 focus:ring-purple-500 border-gray-300" required>
-                                <div class="ml-4 flex-grow">
-                                    <div class="font-bold text-gray-900 group-hover:text-purple-700">{{ $mp['nama_metode'] }}</div>
-                                    <div class="text-sm text-gray-500">{{ $mp['nomor_rekening'] }} (a.n {{ $mp['nama_pemilik'] }})</div>
-                                </div>
-                                <div class="text-gray-400 text-2xl group-hover:text-purple-600">
-                                    <i class="fas fa-money-check-alt"></i>
-                                </div>
-                            </label>
-                            @endforeach
-                        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            {{-- KOLOM KIRI: DETAIL ITEM --}}
+            <div class="space-y-6">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="bg-gray-50 p-4 border-b border-gray-200">
+                        <h3 class="font-bold text-gray-700">Rincian Pesanan</h3>
                     </div>
-
-                    <h2 class="text-2xl font-bold mt-8 mb-4">Detail Pesanan</h2>
-                    <div class="bg-white border border-gray-300 p-6 rounded">
-                        <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-100">
-                            <div>
-                                <div class="font-bold">Pembelian Kelas Online</div>
-                                <div class="text-sm text-gray-500">Invoice: {{ $trx['kode_invoice'] }}</div>
+                    <div class="p-4 space-y-4">
+                        @foreach($items as $item)
+                        <div class="flex items-center">
+                            <img src="{{ $item->thumbnail ? asset('storage/'.$item->thumbnail) : 'https://via.placeholder.com/80' }}" 
+                                 class="w-16 h-12 object-cover rounded mr-3 bg-gray-200">
+                            <div class="flex-1">
+                                <h4 class="font-bold text-sm text-gray-800 line-clamp-1">{{ $item->nama_kelas }}</h4>
+                                <p class="text-xs text-gray-500">Harga Satuan</p>
+                            </div>
+                            <div class="text-right font-bold text-blue-600 text-sm">
+                                Rp {{ number_format($item->harga_saat_beli, 0, ',', '.') }}
                             </div>
                         </div>
-                        <p class="text-sm text-gray-600">
-                            Dengan menyelesaikan pembelian ini, Anda menyetujui Ketentuan Layanan KelasKu.
-                        </p>
-                    </div>
-                </div>
-
-                <div class="lg:w-1/3 mt-8 lg:mt-0">
-                    <div class="bg-white p-6 shadow-sm border border-gray-200 sticky top-4">
-                        <h3 class="text-xl font-bold mb-4">Ringkasan</h3>
+                        @endforeach
                         
-                        <div class="flex justify-between mb-2 text-gray-600">
-                            <span>Harga Asli:</span>
-                            <span>Rp {{ number_format($trx['total_harga'] * 1.2, 0, ',', '.') }}</span>
-                        </div>
-                        <div class="flex justify-between mb-2 text-gray-600">
-                            <span>Diskon:</span>
-                            <span>-Rp {{ number_format($trx['total_harga'] * 0.2, 0, ',', '.') }}</span>
-                        </div>
-                        <hr class="border-gray-200 my-4">
-                        <div class="flex justify-between mb-6">
-                            <span class="font-bold text-lg">Total:</span>
-                            <span class="font-bold text-2xl text-gray-900">Rp {{ number_format($trx['total_harga'], 0, ',', '.') }}</span>
-                        </div>
-
-                        <button type="submit" class="w-full bg-purple-600 text-white font-bold py-4 text-lg hover:bg-purple-700 transition mb-4">
-                            Selesaikan Pembayaran
-                        </button>
-                        
-                        <div class="text-center text-xs text-gray-500 mt-4">
-                            <i class="fas fa-lock"></i> Transaksi Aman Terenkripsi
+                        <div class="border-t border-gray-100 pt-4 mt-4 flex justify-between items-center">
+                            <span class="font-bold text-lg text-gray-800">Total Tagihan</span>
+                            <span class="font-bold text-2xl text-blue-600">Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}</span>
                         </div>
                     </div>
                 </div>
             </div>
-        </form>
+
+            {{-- KOLOM KANAN: METODE PEMBAYARAN --}}
+            <div class="space-y-6">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="bg-gray-50 p-4 border-b border-gray-200">
+                        <h3 class="font-bold text-gray-700">Pilih Metode Pembayaran</h3>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-sm text-gray-600 mb-4">Silakan transfer nominal tepat ke salah satu rekening di bawah ini:</p>
+                        
+                        <div class="space-y-3">
+                            @forelse($metodePembayaran as $mp)
+                            <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-500 hover:bg-blue-50 transition cursor-pointer group">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h5 class="font-bold text-gray-800 group-hover:text-blue-700">{{ $mp->nama_metode }}</h5>
+                                        <p class="font-mono text-lg font-bold text-gray-900">{{ $mp->nomor_rekening }}</p>
+                                        <p class="text-xs text-gray-500">a.n {{ $mp->nama_pemilik }}</p>
+                                    </div>
+                                    <i class="fas fa-university text-gray-300 group-hover:text-blue-500 text-2xl"></i>
+                                </div>
+                            </div>
+                            @empty
+                            <div class="text-center py-4 text-red-500 text-sm">
+                                Belum ada metode pembayaran yang tersedia. Hubungi Admin.
+                            </div>
+                            @endforelse
+                        </div>
+
+                        {{-- Tombol Konfirmasi (Nanti bisa diarahkan ke upload bukti bayar) --}}
+                        <div class="mt-6">
+                            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow transition">
+                                <i class="fas fa-upload mr-2"></i> Konfirmasi Pembayaran
+                            </button>
+                            <a href="{{ route('home') }}" class="block text-center text-sm text-gray-500 mt-3 hover:underline">Bayar Nanti</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
-</body>
-</html>
+</div>
+@endsection

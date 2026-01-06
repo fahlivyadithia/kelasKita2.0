@@ -33,6 +33,9 @@ Route::middleware('custom.auth')->group(function () {
     Route::delete('/keranjang/{id_keranjang}', [KeranjangApiController::class, 'destroy']);
 
     // Transaksi endpoints
+    Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('/checkout', [TransaksiController::class, 'process']);
+    Route::get('/transaksi/{id}', [TransaksiController::class, 'show']);
     Route::post('/transaksi/checkout', [TransaksiApiController::class, 'checkout']);
     Route::get('/transaksi/{id_transaksi}', [TransaksiApiController::class, 'show']);
     Route::post('/transaksi/bayar', [TransaksiApiController::class, 'bayar']);
@@ -111,4 +114,4 @@ Route::get('/user', function (Request $request) {
         });
     });
 });
-
+});
