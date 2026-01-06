@@ -16,58 +16,61 @@ use App\Http\Controllers\ProgressController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ReportController;
 
+// Storage file serving route - for Laragon Windows compatibility
+Route::get('/storage/{path}', function ($path) {
+    $fullPath = storage_path('app/public/' . $path);
+    
+    if (!file_exists($fullPath)) {
+        abort(404);
+    }
+    
+    return response()->file($fullPath);
+})->where('path', '.*');
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
-// Halaman Home
-Route::get('/', [HomeController::class, 'index'])->name('home');
-
-//detail kelas
-Route::get('/kelas/{id_kelas}', [KelasController::class, 'show'])->name('Detail_kelas');
-Route::post('/checkout', function() {
-    return "Logika Checkout akan dipasang disini. ID Kelas: " . request('id_kelas');
-})->name('checkout.process');
-Route::post('/cart/add/{id}', function($id) {
-    return "Berhasil menambahkan Kelas ID: " . $id . " ke keranjang.";
-})->name('cart.add');
-
-// Route untuk menampilkan view ini
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
-
-// Halaman Register & Prosesnya
-Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
-Route::post('/register', [AuthController::class, 'register'])->name('register.submit');
-
-// Logout
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
- Route::middleware(['auth'])->group(function () {
-
-    // 1. Keranjang
-    Route::middleware(['web'])->group(function () {
-    Route::get('/keranjang', [KeranjangController::class, 'index'])->name('cart.index');
-    Route::post('/cart/add/{id}', [KeranjangController::class, 'addToCart'])->name('cart.add');
-    Route::delete('/cart/remove/{id}', [KeranjangController::class, 'remove'])->name('cart.remove');
-    Route::post('/checkout', function() {
-        return "Fitur Checkout akan dibuat di tahap selanjutnya."; 
-    })->name('checkout.process');
-   });
-
-    Route::middleware(['auth'])->group(function () {
-    Route::post('/checkout', [TransaksiController::class, 'process'])->name('checkout.process');
-    Route::get('/transaksi/{id}', [TransaksiController::class, 'show'])->name('transaksi.show');
-    Route::post('/transaksi/bayar', [TransaksiController::class, 'bayar'])->name('transaksi.bayar');
-
-   Route::get('/student/dashboard', function () {
-        return view('student.dashboard');
-    })->name('student.dashboard');
-
+    Route::get('/', function () {
+        return view('welcome');
     });
 
-Route::middleware(['auth'])->prefix('mentor')->name('mentor.')->group(function () {
+    // Halaman Home
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+
+    //detail kelas
+    Route::get('/kelas/{id_kelas}', [KelasController::class, 'show'])->name('Detail_kelas');
+
+    // Route untuk menampilkan view ini
+    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+
+    // Halaman Register & Prosesnya
+    Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
+    Route::post('/register', [AuthController::class, 'register'])->name('register.submit');
+
+    // Logout
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    Route::middleware(['auth'])->group(function () {
+    });
+
+    // 1. Keranjang
+    Route::middleware(['web', 'auth'])->group(function () {
+        Route::get('/keranjang', [KeranjangController::class, 'index'])->name('cart.index');
+        Route::post('/cart/add/{id}', [KeranjangController::class, 'addToCart'])->name('cart.add');
+        Route::delete('/cart/remove/{id}', [KeranjangController::class, 'remove'])->name('cart.remove');
+        Route::post('/checkout', [TransaksiController::class, 'process'])->name('checkout.process');
+    });
+
+    // 2. Transaksi
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/transaksi/{id}', [TransaksiController::class, 'show'])->name('transaksi.show');
+        Route::post('/transaksi/bayar', [TransaksiController::class, 'bayar'])->name('transaksi.bayar');
+
+    // 3. Student Dashboard
+    Route::get('/student/dashboard', function () {
+        return view('student.dashboard');
+    })->middleware('auth')->name('student.dashboard');
+
+    // 4. Mentor Routes
+    Route::prefix('mentor')->name('mentor.')->group(function () {
 
     // 1. DASHBOARD
     Route::get('/dashboard', [MentorDashboardController::class, 'indexWeb'])->name('dashboard');
