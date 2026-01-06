@@ -26,59 +26,38 @@
         </div>
     </div>
 
-    @if(isset($data['kelas']) && count($data['kelas']) > 0)
+    @if(isset($kelas) && count($kelas) > 0) 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        @foreach($data['kelas'] as $item)
+        @foreach($kelas as $item) 
         <div class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 group border border-gray-100 flex flex-col h-full">
             <div class="relative">
-                <img src="{{ $item['thumbnail'] ? asset('storage/'.$item['thumbnail']) : 'https://via.placeholder.com/400x250?text=KelasKu' }}" alt="{{ $item['nama_kelas'] }}" class="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500">
+                <img src="{{ $item['thumbnail'] ? asset('storage/'.$item['thumbnail']) : 'https://via.placeholder.com/400x250?text=KelasKu' }}" alt="{{ $item['nama_kelas'] }}" class="w-full h-56 object-cover">
                 <div class="absolute top-4 right-4 bg-white text-primary font-bold px-4 py-1.5 rounded-full shadow-md text-sm">
                     Rp {{ number_format($item['harga'], 0, ',', '.') }}
                 </div>
             </div>
 
             <div class="p-6 flex-1 flex flex-col">
-                <div class="flex items-center justify-between mb-3 text-sm">
-                    <div class="flex items-center space-x-2 text-gray-600 font-medium">
-                        <img src="https://ui-avatars.com/api/?name={{ urlencode($item['mentor']['name'] ?? 'M') }}&background=random" class="w-8 h-8 rounded-full border-2 border-white shadow-sm">
-                        <span>{{ $item['mentor']['name'] ?? 'Mentor' }}</span>
-                    </div>
-                    <span class="text-gray-400 text-xs"><i class="far fa-calendar-alt mr-1"></i> {{ date('d M Y', strtotime($item['created_at'])) }}</span>
-                </div>
-
-                <h3 class="text-xl font-bold text-gray-800 mb-3 leading-snug line-clamp-2 hover:text-primary transition">
-                    <a href="{{ route('kelas.detail', $item['id_kelas']) }}">
+                <h3 class="text-xl font-bold text-gray-800 mb-3 leading-snug">
+                    <a href="{{ route('kelas.detail', $item['id_kelas']) }}" class="hover:text-primary transition">
                         {{ $item['nama_kelas'] }}
                     </a>
                 </h3>
-
-                <div class="flex items-center space-x-4 text-sm text-gray-500 mb-6">
-                    <span class="flex items-center"><i class="far fa-clock mr-2 text-primary"></i> 15 Jam</span>
-                    <span class="flex items-center"><i class="far fa-play-circle mr-2 text-primary"></i> 24 Materi</span>
-                </div>
-
-                <div class="mt-auto flex items-center justify-between pt-4 border-t border-gray-100">
-                    <a href="{{ route('kelas.detail', $item['id_kelas']) }}" class="text-primary font-semibold text-sm hover:underline transition">
+                <p class="text-sm text-gray-500 mb-4 line-clamp-2">{{ $item['description'] ?? 'Deskripsi kelas...' }}</p>
+                
+                <div class="mt-auto pt-4 border-t border-gray-100">
+                    <a href="{{ route('kelas.detail', $item['id_kelas']) }}" class="text-primary font-bold text-sm hover:underline">
                         Lihat Detail <i class="fas fa-arrow-right ml-1"></i>
                     </a>
-                    <div class="text-yellow-400 text-sm">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
-                        <span class="text-gray-600 ml-1 font-semibold">(4.8)</span>
-                    </div>
                 </div>
             </div>
         </div>
         @endforeach
     </div>
     @else
-    <div class="text-center py-20 bg-white rounded-2xl shadow-sm border border-gray-100">
-        <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" alt="Kosong" class="w-32 mx-auto mb-4 opacity-50">
-        <h3 class="text-xl font-bold text-gray-700 mb-2">Belum Ada Kursus</h3>
-        <p class="text-gray-500">Saat ini belum ada kursus yang tersedia untuk ditampilkan.</p>
+    <div class="text-center py-20">
+        <h3 class="text-xl font-bold text-gray-700">Belum Ada Kursus</h3>
+        <p class="text-gray-500">Silakan input data kelas melalui Database secara manual.</p>
     </div>
     @endif
 </section>

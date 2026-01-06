@@ -37,7 +37,7 @@ Route::post('/register', [AuthController::class, 'register'])->name('register.su
 // Logout
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
- //Route::middleware(['auth'])->group(function () {
+ Route::middleware(['auth'])->group(function () {
 
     // 1. Keranjang
     Route::get('/keranjang', [KeranjangController::class, 'index'])->name('keranjang.index');
@@ -49,11 +49,11 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/transaksi/{id_transaksi}', [TransaksiController::class, 'show'])->name('transaksi.show');
     Route::post('/transaksi/bayar', [TransaksiController::class, 'bayar'])->name('transaksi.bayar');
 
-   // Route::get('/student/dashboard', function () {
-       // return "Halo Siswa! Ini Dashboard Student (Masih Kosong).";
-   // })->name('student.dashboard');
+   Route::get('/student/dashboard', function () {
+        return "Halo Siswa! Ini Dashboard Student (Masih Kosong).";
+    })->name('student.dashboard');
 
-//});
+    });
 
 Route::middleware(['auth'])->prefix('mentor')->name('mentor.')->group(function () {
 
