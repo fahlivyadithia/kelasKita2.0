@@ -57,6 +57,8 @@ class User extends Authenticatable
     // ✅ Relasi ke Mentor
     protected $casts = [
         'password' => 'hashed',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     // Role Helper Methods
