@@ -1,9 +1,14 @@
 <?php
 
+
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\KelasController;
+use App\Http\Controllers\KeranjangController;
+use App\Http\Controllers\TransaksiController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Api\Mentor\MentorDashboardController; // Pastikan path ini sesuai
-use App\Http\Controllers\Api\Mentor\KelasController;
+use App\Http\Controllers\Api\Mentor\MentorDashboardController; // Pastikan path ini sesuai    
+use App\Http\Controllers\Api\Mentor\KelasController as MentorKelasController;
 use App\Http\Controllers\Api\Mentor\MateriController;
 use App\Http\Controllers\Api\Mentor\SubMateriController;
 
@@ -11,9 +16,22 @@ use App\Http\Controllers\ProgressController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ReportController;
 
+
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Halaman Home
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+//detail kelas
+Route::get('/kelas/{id_kelas}', [KelasController::class, 'show'])->name('Detail_kelas');
+Route::post('/checkout', function() {
+    return "Logika Checkout akan dipasang disini. ID Kelas: " . request('id_kelas');
+})->name('checkout.process');
+Route::post('/cart/add/{id}', function($id) {
+    return "Berhasil menambahkan Kelas ID: " . $id . " ke keranjang.";
+})->name('cart.add');
 
 // Route untuk menampilkan view ini
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -26,21 +44,28 @@ Route::post('/register', [AuthController::class, 'register'])->name('register.su
 // Logout
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// --- RUTE PROGRESS, REVIEW, & REPORT (GABUNGAN) ---
-Route::middleware(['auth'])->group(function () {
-    
-    // 1. FITUR PROGRESS (Halaman Belajar & Checklist)
-    Route::get('/kelas/{id_kelas}/belajar', [ProgressController::class, 'show'])->name('kelas.belajar');
-    Route::post('/progress/toggle', [ProgressController::class, 'toggle'])->name('progress.toggle');
-    Route::get('/learning', [ProgressController::class, 'index'])->name('learning.index');
+ Route::middleware(['auth'])->group(function () {
 
-    // 2. FITUR REVIEW (CRUD: Create, Update, Delete)
-    Route::post('/review/{id_kelas}', [ReviewController::class, 'store'])->name('review.store');
-    Route::put('/review/{id_review}', [ReviewController::class, 'update'])->name('review.update');
-    Route::delete('/review/{id_review}', [ReviewController::class, 'destroy'])->name('review.destroy');
+    // 1. Keranjang
+    Route::middleware(['web'])->group(function () {
+    Route::get('/keranjang', [KeranjangController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add/{id}', [KeranjangController::class, 'addToCart'])->name('cart.add');
+    Route::delete('/cart/remove/{id}', [KeranjangController::class, 'remove'])->name('cart.remove');
+    Route::post('/checkout', function() {
+        return "Fitur Checkout akan dibuat di tahap selanjutnya."; 
+    })->name('checkout.process');
+   });
 
-    // 3. FITUR REPORT (Pelaporan Masalah)
-    Route::post('/report/store/{id_kelas}', [ReportController::class, 'store'])->name('report.store');
+    Route::middleware(['auth'])->group(function () {
+    Route::post('/checkout', [TransaksiController::class, 'process'])->name('checkout.process');
+    Route::get('/transaksi/{id}', [TransaksiController::class, 'show'])->name('transaksi.show');
+    Route::post('/transaksi/bayar', [TransaksiController::class, 'bayar'])->name('transaksi.bayar');
+
+   Route::get('/student/dashboard', function () {
+        return view('student.dashboard');
+    })->name('student.dashboard');
+
+    });
 
 });
 
@@ -79,5 +104,5 @@ Route::middleware(['auth'])->prefix('mentor')->name('mentor.')->group(function (
              Route::delete('/{id_sub_materi}', [SubMateriController::class, 'destroy'])->name('destroy');
         });
     });
-
+});
 });
