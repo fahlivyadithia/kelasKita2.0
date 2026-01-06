@@ -71,10 +71,7 @@ class Kelas extends Model
         return $this->hasMany(TransaksiDetail::class, 'id_kelas');
     }
 
-    public function materi()
-    {
-        return $this->hasMany(Materi::class, 'id_kelas', 'id_kelas');
-    }
+
 
     public function adminNote()
     {

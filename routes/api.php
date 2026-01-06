@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\MentorDashboardController;
 use App\Http\Controllers\Api\Murid\ApiReviewController;
 use App\Http\Controllers\Api\Murid\ApiProgressController;
 use App\Http\Controllers\Api\Murid\ApiReportController;
+use App\Http\Controllers\TransaksiController;
 
 // === PUBLIC ROUTES ===
 Route::post('/register', [AuthController::class, 'register']);
@@ -113,7 +114,29 @@ Route::get('/user', function (Request $request) {
             Route::patch('/{id}/status', [\App\Http\Controllers\Api\Admin\UserController::class, 'updateStatus']);
             Route::patch('/{id}/catatan', [\App\Http\Controllers\Api\Admin\UserController::class, 'updateCatatan']);
             Route::patch('/{id}/activate', [\App\Http\Controllers\Api\Admin\UserController::class, 'activate']);
+        });
 
+        // Kelas Management
+        Route::prefix('kelas')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Api\Admin\KelasController::class, 'index']);
+            Route::get('/{id}', [\App\Http\Controllers\Api\Admin\KelasController::class, 'show']);
+            Route::delete('/{id}', [\App\Http\Controllers\Api\Admin\KelasController::class, 'destroy']);
+            Route::patch('/{id}/status', [\App\Http\Controllers\Api\Admin\KelasController::class, 'updateStatus']);
+            Route::patch('/{id}/catatan', [\App\Http\Controllers\Api\Admin\KelasController::class, 'updateCatatan']);
+        });
+
+        // Laporan (Transaksi) Management
+        Route::prefix('laporan')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Api\Admin\LaporanController::class, 'index']);
+        });
+
+        // Report (User Complaints) Management
+        Route::prefix('reports')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Api\Admin\ReportController::class, 'index']);
+            Route::get('/{id}', [\App\Http\Controllers\Api\Admin\ReportController::class, 'show']);
+            Route::delete('/{id}', [\App\Http\Controllers\Api\Admin\ReportController::class, 'destroy']);
+            Route::patch('/{id}/status', [\App\Http\Controllers\Api\Admin\ReportController::class, 'updateStatus']);
+            Route::patch('/{id}/catatan', [\App\Http\Controllers\Api\Admin\ReportController::class, 'updateCatatan']);
         });
     });
 });
